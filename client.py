@@ -3,12 +3,16 @@ import os, sys, time
 import random
 
 ## IRC Config
-server = "192.168.0.17" # The IP/Hostname to connect to.
-server_hostname = "pesterchum.xyz" # The server's hostname.
-port = 6697
+server = "127.0.0.1" # The IP/Hostname to connect to.
+server_hostname = "irc.pesterchum.xyz" # The server's hostname.
+#server = "havoc.ddns.net"
+#server_hostname = "irc.havoc.ddns.net"
+port = 3333
 botnick = "calSprite"
-logging_enabled = True
+logging_enabled = False
 mood_on_join_enabled = False
+insecure_mode = False # For if the hostname can't be verified for SSL/TLS.
+                      # Havoc needs True
 
 ## Irrelevant variables
 bot_hostname = "calSprite"
@@ -37,7 +41,7 @@ except:
     nickserv_password = ""
     
 ## IRC
-irc = IRC(server_hostname)
+irc = IRC(server_hostname, insecure_mode)
 irc.connect(server, port, botnick, server_hostname, bot_hostname, bot_servername, bot_realname)
 
 while True:
@@ -46,7 +50,7 @@ while True:
             
         if (text!=None):
             print(text)
-            if (("End of /MOTD" in text) & (setup_finished==False)):
+            if ((("End of /MOTD" in text)|("MOTD File is missing" in text)) & (setup_finished==False)):
                 print("End of /MOTD found")
                 if (irc.post_connect_setup(botnick, nickserv_username, nickserv_password)==0):
                     setup_finished = True
@@ -69,11 +73,12 @@ while True:
                             f = open("reports.txt", "a")
                             f.write(text + '\n')
                             f.close()
-                        else:
-                            if ( ("PRIVMSG calSprite" in textSplit[1])&("COLOR >" not in textSplit[2])&("PESTERCHUM" not in textSplit[2]) ):
-                                nick = textSplit[1].split('!')
-                                irc.send("PRIVMSG "+ nick[0] + " Howdy! I currently do not do anything except forward reports, so please refrain from messaging me, thank you!" + "\n")
-                    
+                            irc.send("PRIVMSG "+ nick[0] + " Report send." + "\n")
+                    else:
+                        if ( ("PRIVMSG calSprite" in textSplit[1])&("COLOR >" not in textSplit[2])&("PESTERCHUM" not in textSplit[2]) ):
+                            nick = textSplit[1].split('!')
+                            irc.send("PRIVMSG "+ nick[0] + " Howdy! I currently do not do anything except forward reports, so please refrain from messaging me, thank you!" + "\n")
+                                
         else:
             time.sleep(1)
     except KeyboardInterrupt:
