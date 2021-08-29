@@ -97,17 +97,7 @@ class IRC:
 
         return 0
         
-    def disconnect(self, do_not_random_encounter):
-
-        DN_RE_string = ""
-        for x in range(len(do_not_random_encounter)):
-            DN_RE_string += do_not_random_encounter[x]
-            DN_RE_string += " "
-        DN_RE_string = DN_RE_string.strip()
-        
-        f = open("do_not_random_encounter.txt", "w")
-        f.write(DN_RE_string)
-        f.close()
+    def disconnect(self):
         
         self.irc.settimeout(1) # Time to wait for a response to QUIT from the server.
         self.irc.send(bytes("QUIT" + "\n", "UTF-8")) # Send quit command to server.

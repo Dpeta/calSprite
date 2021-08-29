@@ -1,6 +1,9 @@
 from irc import *
-import os, sys, time
+import os
+import sys
+import time
 import random
+import datetime
 
 ## IRC Config
 server = "127.0.0.1" # The IP/Hostname to connect to.
@@ -23,6 +26,14 @@ nickserv_username = "calSprite"
 ## Don't edit the variables past this point.
 setup_finished = False
 do_not_random_encounter_afk = []
+canon_handles = ["apocalypseArisen", "arsenicCatnip", "arachnidsGrip", "adiosToreador", \
+                 "caligulasAquarium", "cuttlefishCuller", "carcinoGeneticist", "centaursTesticle", \
+                 "grimAuxiliatrix", "gallowsCalibrator", "gardenGnostic", "ectoBiologist", \
+                 "twinArmageddons", "terminallyCapricious", "turntechGodhead", "tentacleTherapist", "meeps"]
+online_time_dictionary = {}
+#for x in canon_handles:
+#    online_time_dictionary.update({x: datetime.datetime.now()})
+print("online_time_dictionary =" + str(online_time_dictionary))
 
 ## Checks if files are missing and asks to generate them if they are.
 if (os.path.exists("./password.txt") == False):
@@ -60,6 +71,42 @@ while True:
             textSplit = text.split(":")
             if (len(textSplit) > 1):
                 if (len(textSplit) > 2):
+                    nick = textSplit[1].split('!')
+                    command = textSplit[1].split(' ')[1]
+
+                    # command from canon handle
+                    if nick[0] in canon_handles:
+                        print("canon")
+                        # join
+                        if command == "JOIN":
+                            print("canon join")
+                            if textSplit[2].startswith("#pesterchum"):
+                                print("canon join #pesterchum")
+                                print("update " + nick[0])
+                                online_time_dictionary.update({nick[0]: datetime.datetime.now()})
+                        # quit
+                        elif command == "QUIT":
+                            print("canon QUIT")
+                            print("update " + nick[0])
+                            online_time_dictionary.pop(nick[0])
+                        # part #pesterchum
+                        elif textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] == "PART#pesterchum":
+                            print("canon PART")
+                            print("canon part #pesterchum")
+                            print("update " + nick[0])
+                            online_time_dictionary.pop(nick[0])
+                        # nick change from canon handle
+                        elif command == "NICK":
+                            print("pop da funni handle :o3")
+                            online_time_dictionary.pop(nick[0])
+
+                    # nick change to canon handle
+                    if (command == "NICK") & (textSplit[2].strip() in canon_handles):
+                        print("NICK change to canon handle, new key.")
+                        online_time_dictionary.update({textSplit[2].strip(): datetime.datetime.now()})
+                            
+                        #print(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2])
+                    
                     if (mood_on_join_enabled==True):
                         # Give mood
                         # Because of the bot's modes, we can't actually check for GETMOOD,
@@ -68,21 +115,37 @@ while True:
                         # so disabling it might actually be better for people with low bandwith :(
                         if (("JOIN" in textSplit[1])&("#pesterchum" in textSplit[2])):
                             irc.send("PRIVMSG #pesterchum MOOD >7" + "\n")
-                    if (("PRIVMSG calSprite" in textSplit[1])&("REPORT" in textSplit[2])):
+                    if (("PRIVMSG calSprite" in textSplit[1])&("REPORT" in textSplit[2]) | ("PRIVMSG calSprite" in textSplit[1])&(textSplit[2].lower().startswith("report")) ):
                             irc.send("PRIVMSG #reports "+ str(text) + "\n")
                             f = open("reports.txt", "a")
                             f.write(text + '\n')
                             f.close()
                             irc.send("PRIVMSG "+ nick[0] + " Report send." + "\n")
+                    elif (("PRIVMSG calSprite" in textSplit[1])&("onlineall" in textSplit[2].lower())):
+                        #time_difference = online_time_dictionary
+                        time_difference = {}
+                        for x in online_time_dictionary:
+                            time_difference.update({x: datetime.datetime.now()-online_time_dictionary[x]})
+
+                        send_string = ""
+                        for x in time_difference:
+                            send_string += "PRIVMSG "+ nick[0] + " " + x + " has been online for " + str(round(time_difference[x].total_seconds() / 60, 0)) + " minutes.\n"
+                        #for x in send_string:
+                        if send_string != '':
+                            irc.send(send_string)
+                        else:
+                            irc.send("PRIVMSG "+ nick[0] + " No handles being tracked.\n")
+                        #irc.send("PRIVMSG "+ nick[0] + str( round(difference.total_seconds() / 60, 0) ) + " minutes." + "\n")
                     else:
                         if ( ("PRIVMSG calSprite" in textSplit[1])&("COLOR >" not in textSplit[2])&("PESTERCHUM" not in textSplit[2]) ):
-                            nick = textSplit[1].split('!')
-                            irc.send("PRIVMSG "+ nick[0] + " Howdy! I currently do not do anything except forward reports, so please refrain from messaging me, thank you!" + "\n")
+                            irc.send("PRIVMSG "+ nick[0] + " Commands are:" + "\n")
+                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"report [MESSAGE]\"" + "\n")
+                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"onlineall\"" + "\n")
                                 
         else:
             time.sleep(1)
     except KeyboardInterrupt:
-        if (irc.disconnect(do_not_random_encounter) == 0):
+        if (irc.disconnect() == 0):
             print("Exiting gracefully.")
             sys.exit(0)
         else:
