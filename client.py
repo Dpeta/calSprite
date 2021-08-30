@@ -138,7 +138,7 @@ while True:
 
                         send_string = ""
                         for x in time_difference:
-                            send_string += "PRIVMSG "+ nick[0] + " " + x + " has been online for " + str(round(time_difference[x].total_seconds() / 60, 0)) + " minutes.\n"
+                            send_string += "PRIVMSG "+ nick[0] + " " + x + " has been online for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.\n"
                         #for x in send_string:
                         if send_string != '':
                             irc.send(send_string)
