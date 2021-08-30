@@ -88,17 +88,26 @@ while True:
                         elif command == "QUIT":
                             print("canon QUIT")
                             print("update " + nick[0])
-                            online_time_dictionary.pop(nick[0])
+                            try:
+                                online_time_dictionary.pop(nick[0])
+                            except:
+                                print("Can't pop, no such key.")
                         # part #pesterchum
                         elif textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] == "PART#pesterchum":
                             print("canon PART")
                             print("canon part #pesterchum")
                             print("update " + nick[0])
-                            online_time_dictionary.pop(nick[0])
+                            try:
+                                online_time_dictionary.pop(nick[0])
+                            except:
+                                print("Can't pop, no such key.")
                         # nick change from canon handle
                         elif command == "NICK":
                             print("pop da funni handle :o3")
-                            online_time_dictionary.pop(nick[0])
+                            try:
+                                online_time_dictionary.pop(nick[0])
+                            except:
+                                print("Can't pop, no such key.")
 
                     # nick change to canon handle
                     if (command == "NICK") & (textSplit[2].strip() in canon_handles):
