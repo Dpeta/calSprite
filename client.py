@@ -29,7 +29,9 @@ do_not_random_encounter_afk = []
 canon_handles = ["apocalypseArisen", "arsenicCatnip", "arachnidsGrip", "adiosToreador", \
                  "caligulasAquarium", "cuttlefishCuller", "carcinoGeneticist", "centaursTesticle", \
                  "grimAuxiliatrix", "gallowsCalibrator", "gardenGnostic", "ectoBiologist", \
-                 "twinArmageddons", "terminallyCapricious", "turntechGodhead", "tentacleTherapist", "meeps"]
+                 "twinArmageddons", "terminallyCapricious", "turntechGodhead", "tentacleTherapist", "meeps", \
+                 "gutsyGumshoe", "timaeusTestified", "tipsyGnostalgic", "golgothasTerror", \
+                 "ghostyTrickster", "undyingUmbrage", "uranianUmbra", "glutinousGymnast", "adamantGriftress", "thespiansGlamor"]
 online_time_dictionary = {}
 #for x in canon_handles:
 #    online_time_dictionary.update({x: datetime.datetime.now()})
