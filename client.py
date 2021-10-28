@@ -73,8 +73,14 @@ while True:
             textSplit = text.split(":")
             if (len(textSplit) > 1):
                 if (len(textSplit) > 2):
-                    nick = textSplit[1].split('!')
-                    command = textSplit[1].split(' ')[1]
+                    try:
+                        nick = textSplit[1].split('!')
+                        command = textSplit[1].split(' ')[1]
+                    except:
+                        print("wtf sus????")
+                        print("textSplit = " + str(textSplit))
+                        nick = ['','']
+                        command = ''
 
                     # command from canon handle
                     if nick[0] in canon_handles:
