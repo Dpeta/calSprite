@@ -16,6 +16,7 @@ logging_enabled = False
 mood_on_join_enabled = False
 insecure_mode = False # For if the hostname can't be verified for SSL/TLS.
                       # Havoc needs True
+calsprite_rules_reminder_msg = "Welcome to Pesterchum! This is an automated reminder to please read the rules regarding canon handles: ( https://www.pesterchum.xyz/pesterchum-rules/ )" # Set to "" to disable
 
 ## Irrelevant variables
 bot_hostname = "calSprite"
@@ -92,13 +93,24 @@ while True:
                                 print("canon join #pesterchum")
                                 print("update " + nick[0])
                                 online_time_dictionary.update({nick[0]: datetime.datetime.now()})
+
+                                #Send rules notification
+                                try:
+                                    if calsprite_rules_reminder_msg != "":
+                                        irc.send("PRIVMSG " + nick[0]  + " " + calsprite_rules_reminder_msg + "\n")
+                                except NameError as e:
+                                    print("This shouldn't happen </3 " + str(e))
+                                except KeyError as e:
+                                    print("This shouldn't happen </3" + str(e))
                         # quit
                         elif command == "QUIT":
                             print("canon QUIT")
                             print("update " + nick[0])
                             try:
                                 online_time_dictionary.pop(nick[0])
-                            except:
+                            except NameError:
+                                print("Can't pop, no such key.")
+                            except KeyError:
                                 print("Can't pop, no such key.")
                         # part #pesterchum
                         elif textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] == "PART#pesterchum":
@@ -107,14 +119,18 @@ while True:
                             print("update " + nick[0])
                             try:
                                 online_time_dictionary.pop(nick[0])
-                            except:
+                            except NameError:
+                                print("Can't pop, no such key.")
+                            except KeyError:
                                 print("Can't pop, no such key.")
                         # nick change from canon handle
                         elif command == "NICK":
                             print("pop da funni handle :o3")
                             try:
                                 online_time_dictionary.pop(nick[0])
-                            except:
+                            except NameError:
+                                print("Can't pop, no such key.")
+                            except KeyError:
                                 print("Can't pop, no such key.")
 
                     # nick change to canon handle
@@ -122,7 +138,12 @@ while True:
                         print("NICK change to canon handle, new key.")
                         online_time_dictionary.update({textSplit[2].strip(): datetime.datetime.now()})
                             
-                        #print(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2])
+                        #Send rules notification
+                        try:
+                            if calsprite_rules_reminder_msg != "":
+                                irc.send("PRIVMSG " + textSplit[2].strip()  + " " + calsprite_rules_reminder_msg + "\n")
+                        except NameError:
+                            print("This shouldn't happen </3")
                     
                     if (mood_on_join_enabled==True):
                         # Give mood
@@ -157,9 +178,18 @@ while True:
                         if ( ("PRIVMSG calSprite" in textSplit[1])&("COLOR >" not in textSplit[2])&("PESTERCHUM" not in textSplit[2]) ):
                             irc.send("PRIVMSG "+ nick[0] + " Commands are:" + "\n")
                             irc.send("PRIVMSG "+ nick[0] + " " + "    \"report [MESSAGE]\"" + "\n")
-                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"onlineall\"" + "\n")
-                                
+                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"onlineall\"" + "\n")                    
         else:
+            # Check overtime
+            time_difference = {}
+            for x in online_time_dictionary:
+                time_difference.update({x: datetime.datetime.now()-online_time_dictionary[x]})
+                if ( int(time_difference[x].total_seconds()) % 3600 == 0) & \
+                   ( time_difference[x].total_seconds() > 1728000 ): #check if >8 hours every 60min
+                    irc.send("PRIVMSG #reports " + " " + x + " has been online for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.\n")
+                    irc.send("PRIVMSG "+ x + " This is an automated reminder not to hog canon handles :3 (According to calsprite you've been on " + x + " for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.)\n")
+                    
+            # Blanky mode
             time.sleep(1)
     except KeyboardInterrupt:
         if (irc.disconnect() == 0):
