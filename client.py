@@ -174,20 +174,33 @@ while True:
                         else:
                             irc.send("PRIVMSG "+ nick[0] + " No handles being tracked.\n")
                         #irc.send("PRIVMSG "+ nick[0] + str( round(difference.total_seconds() / 60, 0) ) + " minutes." + "\n")
+                    elif (("PRIVMSG calSprite" in textSplit[1])&("help" in textSplit[2].lower())):
+                        irc.send("PRIVMSG "+ nick[0] + " Replacement calSprite bot by @_turntechCatnip, msg for questions :3" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " Relevant resources:" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - Website link: https://pesterchum.xyz" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - Github repository: https://github.com/Dpeta/pesterchum-alt-servers" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - Releases & Downloads: https://github.com/Dpeta/pesterchum-alt-servers/releases" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - " + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - Pesterchum Discord: https://discord.gg/eKbP6pvUmZ" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - Pesterchum Republic: https://discord.gg/BbHvdwN" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - " + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - @calSprite repository: https://github.com/Dpeta/calSprite" + "\n")
+                        irc.send("PRIVMSG "+ nick[0] + " - @randomEncounter repository: https://github.com/Dpeta/randomEncounter" + "\n")
                     else:
                         if ( ("PRIVMSG calSprite" in textSplit[1])&("COLOR >" not in textSplit[2])&("PESTERCHUM" not in textSplit[2]) ):
                             irc.send("PRIVMSG "+ nick[0] + " Commands are:" + "\n")
                             irc.send("PRIVMSG "+ nick[0] + " " + "    \"report [MESSAGE]\"" + "\n")
-                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"onlineall\"" + "\n")                    
+                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"onlineall\"" + "\n")
+                            irc.send("PRIVMSG "+ nick[0] + " " + "    \"help\"" + "\n")
         else:
-            # Check overtime
-            time_difference = {}
-            for x in online_time_dictionary:
-                time_difference.update({x: datetime.datetime.now()-online_time_dictionary[x]})
-                if ( int(time_difference[x].total_seconds()) % 3600 == 0) & \
-                   ( time_difference[x].total_seconds() > 1728000 ): #check if >8 hours every 60min
-                    irc.send("PRIVMSG #reports " + " " + x + " has been online for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.\n")
-                    irc.send("PRIVMSG "+ x + " This is an automated reminder not to hog canon handles :3 (According to calsprite you've been on " + x + " for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.)\n")
+        #    # Check overtime
+        #    time_difference = {}
+        #    for x in online_time_dictionary:
+        #        time_difference.update({x: datetime.datetime.now()-online_time_dictionary[x]})
+        #        if ( int(time_difference[x].total_seconds()) % 3600 == 0) & \
+        #           ( time_difference[x].total_seconds() > 1728000 ): #check if >8 hours every 60min
+        #            irc.send("PRIVMSG #reports " + " " + x + " has been online for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.\n")
+        #            irc.send("PRIVMSG "+ x + " This is an automated reminder not to hog canon handles :3 (According to calsprite you've been on " + x + " for " + str(round(time_difference[x].total_seconds() / 60)) + " minutes.)\n")
                     
             # Blanky mode
             time.sleep(1)
