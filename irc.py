@@ -79,13 +79,14 @@ class IRC:
 
     def post_connect_setup(self, botnick, nickserv_username, nickserv_password):
         print(self.get_response())
+        self.irc.send(bytes("PRIVMSG nickserv recover " + nickserv_username + " " + nickserv_password + "\n", "UTF-8"))
         self.irc.send(bytes("PRIVMSG nickserv identify " + nickserv_username + " " + nickserv_password + "\n", "UTF-8"))
         self.irc.send(bytes("MODE " + botnick + " +Bd " + "\n", "UTF-8"))
         self.irc.send(bytes("VHOST bot bot" + "\n", "UTF-8"))
         print(self.get_response())
 
-        self.irc.send(bytes("PRIVMSG nickserv identify " + nickserv_username + " " + nickserv_password + "\n", "UTF-8"))
-        self.irc.send(bytes("PRIVMSG nickserv recover " + nickserv_username + " " + nickserv_password + "\n", "UTF-8"))
+        #self.irc.send(bytes("PRIVMSG nickserv identify " + nickserv_username + " " + nickserv_password + "\n", "UTF-8"))
+        #self.irc.send(bytes("PRIVMSG nickserv recover " + nickserv_username + " " + nickserv_password + "\n", "UTF-8"))
         time.sleep(0.5)
         self.irc.send(bytes("NICK " + botnick + "\n", "UTF-8"))
         print(self.get_response())

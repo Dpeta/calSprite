@@ -64,8 +64,8 @@ while True:
             
         if (text!=None):
             print(text)
-            if ((("End of /MOTD" in text)|("MOTD File is missing" in text)) & (setup_finished==False)):
-                print("End of /MOTD found")
+            #if ((("End of /MOTD" in text)|("MOTD File is missing" in text)) & (setup_finished==False)):
+            if setup_finished==False:
                 if (irc.post_connect_setup(botnick, nickserv_username, nickserv_password)==0):
                     setup_finished = True
                 print("setup_finished = " + str(setup_finished))
@@ -73,19 +73,24 @@ while True:
             # RE check
             textSplit = text.split(":")
             if (len(textSplit) > 1):
-                if (len(textSplit) > 2):
-                    try:
-                        nick = textSplit[1].split('!')
-                        command = textSplit[1].split(' ')[1]
-                    except:
-                        print("wtf sus????")
-                        print("textSplit = " + str(textSplit))
-                        nick = ['','']
-                        command = ''
-
+                print("len textSplit > 1")
+                try:
+                    nick = textSplit[1].split('!')
+                    command = textSplit[1].split(' ')[1]
+                except:
+                    print("wtf sus????")
+                    print("textSplit = " + str(textSplit))
+                    nick = ['','']
+                    command = ''
+                
+                if len(textSplit) > 2:
+                    print("len textSplit > 2")
+                    
                     # command from canon handle
+                    print("nick[0] == " + nick[0])
                     if nick[0] in canon_handles:
                         print("canon")
+                        print(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2])
                         # join
                         if command == "JOIN":
                             print("canon join")
@@ -112,17 +117,17 @@ while True:
                                 print("Can't pop, no such key.")
                             except KeyError:
                                 print("Can't pop, no such key.")
-                        # part #pesterchum
-                        elif textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] == "PART#pesterchum":
-                            print("canon PART")
-                            print("canon part #pesterchum")
-                            print("update " + nick[0])
-                            try:
-                                online_time_dictionary.pop(nick[0])
-                            except NameError:
-                                print("Can't pop, no such key.")
-                            except KeyError:
-                                print("Can't pop, no such key.")
+                        # old part #pesterchum
+                        #elif textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] == "PART#pesterchum":
+                        #    print("canon PART")
+                        #    print("canon part #pesterchum")
+                        #    print("update " + nick[0])
+                        #    try:
+                        #        online_time_dictionary.pop(nick[0])
+                        #    except NameError:
+                        #        print("Can't pop, no such key.")
+                        #    except KeyError:
+                        #        print("Can't pop, no such key.")
                         # nick change from canon handle
                         elif command == "NICK":
                             print("pop da funni handle :o3")
@@ -192,6 +197,27 @@ while True:
                             irc.send("PRIVMSG "+ nick[0] + " " + "    \"report [MESSAGE]\"" + "\n")
                             irc.send("PRIVMSG "+ nick[0] + " " + "    \"onlineall\"" + "\n")
                             irc.send("PRIVMSG "+ nick[0] + " " + "    \"help\"" + "\n")
+                            
+                # textsplit len 1 PART check
+                # PART doesn't have a ':' ig??
+                #print(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2])
+                #print("len(textSplit[1].split(' ')) = " + str(len(textSplit[1].split(' '))))
+                if len(textSplit[1].split(' ')) >= 2:
+                    #print("len(textSplit[1].split(' ')) >= 2")
+                    #print("textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] = \"%s\"" % str(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2]))
+                    #print(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2] == "PART#pesterchum")
+                    command_plus_target = textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2]
+                    command_plus_target = command_plus_target.replace('\n','').replace('\r','').strip()
+                    if command_plus_target == "PART#pesterchum": 
+                        print("canon PART")
+                        print("canon part #pesterchum")
+                        print("update " + nick[0])
+                        try:
+                            online_time_dictionary.pop(nick[0])
+                        except NameError:
+                            print("Can't pop, no such key.")
+                        except KeyError:
+                            print("Can't pop, no such key.")
         else:
         #    # Check overtime
         #    time_difference = {}
