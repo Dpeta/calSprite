@@ -69,25 +69,25 @@ while True:
                 if (irc.post_connect_setup(botnick, nickserv_username, nickserv_password)==0):
                     setup_finished = True
                 print("setup_finished = " + str(setup_finished))
-
             # RE check
             textSplit = text.split(":")
             if (len(textSplit) > 1):
-                print("len textSplit > 1")
+                #print("len textSplit > 1")
                 try:
                     nick = textSplit[1].split('!')
                     command = textSplit[1].split(' ')[1]
-                except:
+                except Exception as e:
+                    print(e)
                     print("wtf sus????")
                     print("textSplit = " + str(textSplit))
                     nick = ['','']
                     command = ''
                 
                 if len(textSplit) > 2:
-                    print("len textSplit > 2")
+                    #print("len textSplit > 2")
                     
                     # command from canon handle
-                    print("nick[0] == " + nick[0])
+                    #print("nick[0] == " + nick[0])
                     if nick[0] in canon_handles:
                         print("canon")
                         print(textSplit[1].split(' ')[1] + textSplit[1].split(' ')[2])
@@ -218,6 +218,17 @@ while True:
                             print("Can't pop, no such key.")
                         except KeyError:
                             print("Can't pop, no such key.")
+
+            # Lingering handles fallback
+            if datetime.datetime.now().second == 30:
+                print('30')
+                handle_list = irc.get_pesterchum_nick_list()
+                for x in online_time_dictionary:
+                    print("x=%s" % (x))
+                    if x not in handle_list:
+                        online_time_dictionary.pop(nick[0])
+                        
+                    
         else:
         #    # Check overtime
         #    time_difference = {}

@@ -3,6 +3,7 @@ import sys
 import time
 import random
 import ssl
+import datetime
 
 class IRC:
     def __init__(self, server_hostname, insecure_mode):
@@ -98,6 +99,36 @@ class IRC:
         print(self.get_response())
 
         return 0
+    #def who_check(self):
+    def get_pesterchum_nick_list(self):
+        who = ''
+        start = datetime.datetime.now()
+        self.irc.send(bytes("WHO #pesterchum" + "\n", "UTF-8"))
+        while ("#pesterchum :End of /WHO list." not in who) and ( (datetime.datetime.now()-start).total_seconds() < 5 ):
+            resp = self.get_response()
+            if resp != None:
+                who += resp
+        who = who.split('\n') # One line per handle
+        handle_list = list()
+        for x in who:
+            x = x.split(':')        # Split by :
+                                    # Example return line:
+                                    # :irc.pesterchum.xyz 352 calSprite #pesterchum pcc31 xxxxxx.xxxxxx.xxxxxx.IP * handleHandle H :0 pcc31
+                                    # who[1] returns "irc.pesterchum.xyz 352 calSprite #pesterchum pcc31 xxxxxx.xxxxxx.xxxxxx.IP * handleHandle H "
+
+            try:
+                handle_cannidate = x[1].split(' ')
+                handle_cannidate = handle_cannidate[7] # Handle
+                handle_list.append(handle_cannidate)
+            except IndexError:
+                #print('IndexError')
+                pass # For messages like "End of /WHO list. "
+
+        # who is now a list of online handles in #pesterchum
+        print(handle_list)
+        print("pog")
+
+        return handle_list
         
     def disconnect(self):
         
