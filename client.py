@@ -63,7 +63,7 @@ while True:
         text = irc.get_response()
             
         if (text!=None):
-            print(text)
+            print(text.strip().strip('\n'))
             #if ((("End of /MOTD" in text)|("MOTD File is missing" in text)) & (setup_finished==False)):
             if setup_finished==False:
                 if (irc.post_connect_setup(botnick, nickserv_username, nickserv_password)==0):
@@ -76,10 +76,10 @@ while True:
                 try:
                     nick = textSplit[1].split('!')
                     command = textSplit[1].split(' ')[1]
-                except Exception as e:
-                    print(e)
-                    print("wtf sus????")
-                    print("textSplit = " + str(textSplit))
+                except IndexError:
+                    #print(e)
+                    #print("wtf sus????")
+                    #print("textSplit = " + str(textSplit))
                     nick = ['','']
                     command = ''
                 
@@ -223,10 +223,23 @@ while True:
             if datetime.datetime.now().second == 30:
                 print('30')
                 handle_list = irc.get_pesterchum_nick_list()
+
+                keylist = list()
                 for x in online_time_dictionary:
+                    keylist.append(x)
+
+                for x in keylist:
                     print("x=%s" % (x))
+                    
                     if x not in handle_list:
-                        online_time_dictionary.pop(nick[0])
+                        print("online_time_dictionary.pop(%s)" % (x))
+                        online_time_dictionary.pop(x)
+                print(online_time_dictionary)
+                
+                #for x in online_time_dictionary:
+                #    print("x=%s" % (x))
+                #    if x not in handle_list:
+                #        online_time_dictionary.pop(x)
                         
                     
         else:

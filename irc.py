@@ -125,8 +125,8 @@ class IRC:
                 pass # For messages like "End of /WHO list. "
 
         # who is now a list of online handles in #pesterchum
-        print(handle_list)
-        print("pog")
+        #print(handle_list)
+        #print("pog")
 
         return handle_list
         
