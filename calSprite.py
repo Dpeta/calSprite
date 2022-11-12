@@ -215,7 +215,7 @@ class RandomEncounterBot:
                                     "ping a mod on discord if it's urgent)")
                 case "ONLINEALL":
                     runtime = int( (datetime.datetime.now()
-                                    - self.start_time).total_seconds()/60/60 )
+                                    - self.start_time).total_seconds()/60 )
                     time_difference = {}
                     for canon_time_key in self.users.canon_times:
                         time_difference.update({canon_time_key:
