@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
-"""randomEnounter bot for Pesterchum using asyncio.
-Retrieves random users for clients and keeps track of
-which clients have random enounters disabled."""
+"""calSprite bot for Pesterchum using asyncio.
+Keeps track of canon handles and gives miscellaneous info."""
 import os
 import time
 import asyncio
@@ -88,8 +87,8 @@ class Users:
             if user not in self.userlist:
                 self.canon_times.pop(user)
 
-class RandomEncounterBot:
-    """Class for an instance of the 'randomEncounter' bot"""
+class CalSpriteBot:
+    """Class for an instance of the 'calSprite' bot"""
 
     def __init__(self):
         self.end = False
@@ -152,7 +151,7 @@ class RandomEncounterBot:
         """Actions to take when the server has send a welcome/001 reply,
         meaning the client is connected and nick/user registration is completed."""
         config = await self.get_config()
-        await self.send("MODE randomEncounter +B")
+        await self.send("MODE calSprite +B")
         await self.send("JOIN #pesterchum")
         await self.send("JOIN #reports")
         await self.send(
@@ -402,6 +401,6 @@ class RandomEncounterBot:
 
 
 if __name__ == "__main__":
-    bot = RandomEncounterBot()
+    bot = CalSpriteBot()
     asyncio.run(bot.main())
     print("Exiting. . .")
