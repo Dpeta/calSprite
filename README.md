@@ -1,42 +1,11 @@
 # calSprite
 calSprite redux
 
-A simple bot for irc servers meant to be used with Pesterchum to serve similar functionality as the original calSprite bot using python3's socket module.
+A calSprite bot for Pesterchum servers, uses asyncio :3
 
-Configure the variables at the top of "client.py" and execute it, or run "run.py" if you'd like to have it automatically restart in the case of unexpected crashes.
+Requires at least Python ``3.10``.
 
-Currently only does:
+Commands:
   - report
   - onlineall
   - help
-
-### Software requirements
-
- - Python 3 (Ideally, 3.6 or higher.)
-
- - OpenSSL
-
-
-
-### Required Python modules
-
- - os
-
- - sys
-
- - time
-
- - socket
-
- - random
-
- - ssl
-
-
-
-### Disclaimer
-
-This bot *may* be exceptionally shoddy.
-
-
-
