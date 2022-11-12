@@ -178,18 +178,9 @@ class RandomEncounterBot:
         for name in names_list:
             # Strip channel operator symbols
             if name[0] in PREFIXES:
-                self.names.append(name[1:])
+                await self.users.add(name[1:])
             else:
-                self.names.append(name)
-
-    async def end_of_names(self, _):
-        """RPL_ENDOFNAMES, NAMES finished"""
-        print(f"{self.users.userlist} replaced with {self.names}")
-        self.users.userlist = []
-        for user in self.names:
-            await self.users.add(user)
-        self.names = []
-        await self.users.sanity_check()
+                await self.users.add(name)
 
     async def privmsg(self, text):
         """Handles incoming PRIVMSG"""
@@ -339,19 +330,27 @@ class RandomEncounterBot:
     async def get_names(self):
         """Routinely retrieve the userlist from scratch."""
         while True:
-            await asyncio.sleep(1800)  # 30min
-            print("Routine NAMES send.")
+            await asyncio.sleep(5)  # 30min
+            print("Routine NAMES reset.")
+            self.users.userlist = []
             try:
                 await self.send("NAMES #pesterchum")
             except AttributeError as fail_names:
                 print(f"Failed to send NAMES, disconnected? {fail_names}")
+                
+    async def sanity_check(self):
+        """Routinely check for incorrect values."""
+        while True:
+            await asyncio.sleep(900)  # 15min
+            print("Routine sanity.")
+            await self.users.sanity_check()
 
     async def main(self):
         """Main function/loop, creates a new task when the server sends data."""
         command_handlers = {
             "001": self.welcome,
             "353": self.nam_reply,
-            "366": self.end_of_names,
+            #"366": self.end_of_names,
             "PING": self.ping,
             "PRIVMSG": self.privmsg,
             "NOTICE": self.notice,
@@ -362,6 +361,7 @@ class RandomEncounterBot:
         }
         # Create task for routinely updating names from scratch
         asyncio.create_task(self.get_names())
+        asyncio.create_task(self.sanity_check())
 
         # Repeats on disconnect
         while not self.end:
