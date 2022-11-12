@@ -330,21 +330,18 @@ class RandomEncounterBot:
     async def get_names(self):
         """Routinely retrieve the userlist from scratch."""
         while True:
-            await asyncio.sleep(5)  # 30min
+            await asyncio.sleep(1200)  # 20min
             print("Routine NAMES reset.")
             self.users.userlist = []
             try:
                 await self.send("NAMES #pesterchum")
             except AttributeError as fail_names:
                 print(f"Failed to send NAMES, disconnected? {fail_names}")
-                
-    async def sanity_check(self):
-        """Routinely check for incorrect values."""
-        while True:
-            await asyncio.sleep(900)  # 15min
-            print("Routine sanity.")
-            await self.users.sanity_check()
 
+            # Run sanity check with a delay
+            await asyncio.sleep(600) # 10min
+            self.users.sanity_check()
+            
     async def main(self):
         """Main function/loop, creates a new task when the server sends data."""
         command_handlers = {
@@ -361,7 +358,6 @@ class RandomEncounterBot:
         }
         # Create task for routinely updating names from scratch
         asyncio.create_task(self.get_names())
-        asyncio.create_task(self.sanity_check())
 
         # Repeats on disconnect
         while not self.end:
