@@ -96,7 +96,6 @@ class RandomEncounterBot:
         self.reader = None
         self.writer = None
         self.users = Users()
-        self.names = []  # For updating userlist via NAMES
         self.start_time = datetime.datetime.now()
 
     async def send(self, text, *params):
