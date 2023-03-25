@@ -3,6 +3,7 @@
 Keeps track of canon handles and gives miscellaneous info."""
 import os
 import time
+import random
 import asyncio
 import datetime
 import traceback
@@ -65,7 +66,7 @@ class Users:
             # Add canon
             if user in CANON_HANDLES and user not in self.canon_times:
                 self.canon_times.update({user: datetime.datetime.now()})
-        print(f"self.canon_times: {self.canon_times}")
+        #print(f"self.canon_times: {self.canon_times}")
 
     async def remove(self, *users):
         """Adds users if they quit/parted or someone changed their nick to a new handle"""
@@ -79,7 +80,7 @@ class Users:
                     self.canon_times.pop(user)
                 except (NameError, KeyError) as key_skill_issue:
                     print(f"Failed to remove canon key. {key_skill_issue}")
-        print(f"self.canon_times: {self.canon_times}")
+        #print(f"self.canon_times: {self.canon_times}")
 
     async def sanity_check(self):
         """Check if there's not any canons that aren't actually online being tracked"""
@@ -122,6 +123,8 @@ class CalSpriteBot:
                 "nickserv_password": "",
                 "vhost_login": "",
                 "vhost_password": "",
+                "oper_password": "",
+                "operserv_password": "",
             }
             with open("config.ini", "w", encoding="utf-8") as configfile:
                 config.write(configfile)
@@ -162,9 +165,28 @@ class CalSpriteBot:
             config["tokens"]["nickserv_username"],
             config["tokens"]["nickserv_password"],
         )
+        # Sign in to operserv
+        if "oper_password" in config["tokens"]:
+            await self.send(
+                "OPER",
+                "calSprite",
+                config["tokens"]["oper_password"],
+                )
+        else:
+            print("oper_password not in config tokens")
+        if "operserv_password" in config["tokens"]:
+            await self.send(
+                "PRIVMSG",
+                "operserv",
+                "login",
+                config["tokens"]["operserv_password"],
+            )
+        else:
+            print("operserv_password not in config tokens")
         # Set mood/color
         await self.send("METADATA * set mood 18")  #  'PROTECTIVE' mood
         await self.send("METADATA * set color #ff0000")  # Red
+        await self.send("PRIVMSG operserv help")
 
     async def nam_reply(self, text):
         """RPL_NAMREPLY, add NAMES reply to userlist"""
@@ -357,11 +379,60 @@ class CalSpriteBot:
             return text_split[0].upper()
         return ""
 
+    async def youreoper(self, *_msg):
+        """Auth to operserv when we're oper."""
+        config = await self.get_config()
+        if "operserv_password" in config["tokens"]:
+            await self.send(
+                "PRIVMSG",
+                "operserv",
+                "login",
+                config["tokens"]["operserv_password"],
+            )
+        else:
+            print("operserv_password not in config tokens")
+        await self.send("PRIVMSG operserv help")
+
+    async def overtime_check_task(self):
+        """Task to check for overtime every hour."""
+        while True:
+            time_difference = {}
+            for canon_time_key in self.users.canon_times:
+                time_difference.update({canon_time_key:
+                                        datetime.datetime.now()
+                                        - self.users.canon_times[canon_time_key]})
+            if time_difference:
+                for canon in time_difference:
+                    if canon == "meeps":
+                        canon_time = int(time_difference[canon].total_seconds() / 60)
+                        if 600 > canon_time > 480:
+                            # Warn for > 8 hours.
+                            await self.overtime_warn(canon)
+                        elif canon_time > 600:
+                            # Change nick for > 10 hours.
+                            await self.overtime(canon)
+            await asyncio.sleep(30)
+
+    async def overtime_warn(self, handle):
+        """Warn someone about being overtime."""
+        await self.send(f"PRIVMSG {handle}",
+                  ":You've been on a canon handle for >8 hours, maybe take a break :3")
+        await self.send(f"PRIVMSG {handle}",
+                  ":Limit is so other people get a turn, "
+                        "check https://www.pesterchum.xyz/pesterchum-rules")
+
+    async def overtime(self, handle):
+        """Move someone off their handle if they've been on for too long."""
+        new_handle = f"{handle}{random.getrandbits(10)}"
+        await self.send(f"PRIVMSG {handle} :Changing your nick because of overtime.")
+        await self.send(f"PRIVMSG operserv SVSNICK {handle} {new_handle}")
+
     async def main(self):
         """Main function/loop, creates a new task when the server sends data."""
         command_handlers = {
             "001": self.welcome,
             "353": self.nam_reply,
+            "381": self.youreoper,
             #"366": self.end_of_names,
             "PING": self.ping,
             "PRIVMSG": self.privmsg,
@@ -373,6 +444,8 @@ class CalSpriteBot:
         }
         # Create task for routinely updating names from scratch
         asyncio.create_task(self.get_names())
+        # Create task for moving overtime users.
+        asyncio.create_task(self.overtime_check_task())
 
         # Repeats on disconnect
         while not self.end:
@@ -388,6 +461,7 @@ class CalSpriteBot:
                     try:
                         data = await self.reader.readline()
                         if data:
+                            print(data)
                             text = await self.decode_data(data)
                             command = await self.get_command(text)
                             # Pass task to the command's associated function if it exists.
