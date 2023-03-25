@@ -186,7 +186,6 @@ class CalSpriteBot:
         # Set mood/color
         await self.send("METADATA * set mood 18")  #  'PROTECTIVE' mood
         await self.send("METADATA * set color #ff0000")  # Red
-        await self.send("PRIVMSG operserv help")
 
     async def nam_reply(self, text):
         """RPL_NAMREPLY, add NAMES reply to userlist"""
@@ -391,7 +390,7 @@ class CalSpriteBot:
             )
         else:
             print("operserv_password not in config tokens")
-        await self.send("PRIVMSG operserv help")
+        await self.send("PRIVMSG operserv HELP")
 
     async def overtime_check_task(self):
         """Task to check for overtime every hour."""
