@@ -402,14 +402,13 @@ class CalSpriteBot:
                                         - self.users.canon_times[canon_time_key]})
             if time_difference:
                 for canon in time_difference:
-                    if canon == "meeps":
-                        canon_time = int(time_difference[canon].total_seconds() / 60)
-                        if 600 > canon_time > 480:
-                            # Warn for > 8 hours.
-                            await self.overtime_warn(canon)
-                        elif canon_time > 600:
-                            # Change nick for > 10 hours.
-                            await self.overtime(canon)
+                    canon_time = int(time_difference[canon].total_seconds() / 60)
+                    if 600 > canon_time > 480:
+                        # Warn for > 8 hours.
+                        await self.overtime_warn(canon)
+                    elif canon_time > 600:
+                        # Change nick for > 10 hours.
+                        await self.overtime(canon)
             await asyncio.sleep(3600)
 
     async def overtime_warn(self, handle):
