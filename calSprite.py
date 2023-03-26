@@ -410,7 +410,7 @@ class CalSpriteBot:
                         elif canon_time > 600:
                             # Change nick for > 10 hours.
                             await self.overtime(canon)
-            await asyncio.sleep(30)
+            await asyncio.sleep(3600)
 
     async def overtime_warn(self, handle):
         """Warn someone about being overtime."""
