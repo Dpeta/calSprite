@@ -232,7 +232,7 @@ class CalSpriteBot:
                     # tested these two lines below on IDLE, seemed to work well
                     inboundReport = msg.split(' ', 2)
                     reportMsgUser, reportMsgBody = inboundReport[1:]
-                    
+
                     # NOTE: untested since i didn't have the time to setup a local irc server (rip scratchware...)
                     ct = datetime.datetime.now()
                     await self.send(f"PRIVMSG #reports {nick}: User \"{reportMsgUser}\" has been reported. Reason:  \"{reportMsgBody}\" ({ct})")
@@ -312,12 +312,18 @@ class CalSpriteBot:
         msg = text[text.find(parameters[1][1:]) :]
 
         if msg.upper().startswith("REPORT"):
-            currTime = datetime.datetime.now
-            await self.send(f"PRIVMSG #reports {nick}: {msg} - at ",  )
-            
-            await self.send(f"PRIVMSG {nick} Report send :3 (mods can only see reports"
-                            " if they're online, might be better to ping "
-                            "a mod on discord if it's urgent)")
+            # tested these two lines below on IDLE, seemed to work well
+            inboundReport = msg.split(' ', 2)
+            reportMsgUser, reportMsgBody = inboundReport[1:]
+
+            # NOTE: untested since i didn't have the time to setup a local irc server (rip scratchware...)
+            ct = datetime.datetime.now()
+            await self.send(f"PRIVMSG #reports {nick}: User \"{reportMsgUser}\" has been reported. Reason:  \"{reportMsgBody}\" ({ct})")
+            await self.send(f"PRIVMSG {nick} Report sent :3")
+            # proposing for more information on the user report reply to be added
+            # example below
+            ## await self.send(f"PRIVMSG {nick} If you would like a follow up, join the Pesterchum Support discord server")
+            ## await self.send(f"PRIVMSG {nick} and ping an oper! Discord: https://discord.gg/eKbP6pvUmZ")
 
     async def ping(self, text):
         """Handle incoming pings"""
