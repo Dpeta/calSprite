@@ -229,10 +229,21 @@ class CalSpriteBot:
             print(cal_command)
             match cal_command.upper():
                 case "REPORT":
-                    await self.send(f"PRIVMSG #reports {nick}: {msg}")
-                    await self.send(f"PRIVMSG {nick} Report send :3 (mods can only see reports"
-                                    " if they're online, might be better to "
-                                    "ping a mod on discord if it's urgent)")
+                    # tested this block on idle
+                    try:
+                        inbound_report = msg.split(' ', 2)
+                        report_msg_user, report_msg_body = inbound_report[1:]
+                        # NOTE: untested since i didn't have the time to setup a local irc server (rip scratchware...)
+                        ct = datetime.datetime.now()
+                        await self.send(f"PRIVMSG #reports {nick}: User \"{report_msg_user}\" has been reported. Reason:  \"{report_msg_body}\" ({ct})")
+                        await self.send(f"PRIVMSG {nick} Report sent :3")
+                        # proposing for more information on the user report reply to be added
+                        # example below
+                        ## await self.send(f"PRIVMSG {nick} If you would like a follow up, join the Pesterchum Support discord server")
+                        ## await self.send(f"PRIVMSG {nick} and ping an oper! Discord: https://discord.gg/eKbP6pvUmZ")
+                    except ValueError:
+                        await self.send(f"PRIVMSG {nick} Please provide a username and a reason.")
+
                 case "ONLINEALL":
                     runtime = int( (datetime.datetime.now()
                                     - self.start_time).total_seconds()/60 )
@@ -258,7 +269,7 @@ class CalSpriteBot:
                 case "HELP":
                     await self.send(f"PRIVMSG {nick} calSprite is just a little weewa :3")
                     await self.send(f"PRIVMSG {nick} Commands are:")
-                    await self.send(f"PRIVMSG {nick} - \"report [MESSAGE]\"")
+                    await self.send(f"PRIVMSG {nick} - \"report [USERNAME] [REASON]\"")
                     await self.send(f"PRIVMSG {nick} - \"onlineall\"")
                     await self.send(f"PRIVMSG {nick} - \"help\"")
                     await self.send(f"PRIVMSG {nick} Resources:")
@@ -274,7 +285,7 @@ class CalSpriteBot:
                 case _:  # Wildcard, matches any value
                     # Help command
                     await self.send(f"PRIVMSG {nick} Commands are:")
-                    await self.send(f"PRIVMSG {nick}    \"report [MESSAGE]\"")
+                    await self.send(f"PRIVMSG {nick}    \"report [USERNAME] [REASON]\"")
                     await self.send(f"PRIVMSG {nick}    \"onlineall\"")
                     await self.send(f"PRIVMSG {nick}    \"help\"")
         else:
@@ -304,11 +315,20 @@ class CalSpriteBot:
         msg = text[text.find(parameters[1][1:]) :]
 
         if msg.upper().startswith("REPORT"):
-            await self.send(f"PRIVMSG #reports {nick}: {msg}")
-            await self.send(f"PRIVMSG {nick} Report send :3 (mods can only see reports"
-                            " if they're online, might be better to ping "
-                            "a mod on discord if it's urgent)")
-
+            # tested these two lines below on IDLE, seemed to work well
+            try:
+                inbound_report = msg.split(' ', 2)
+                report_msg_user, report_msg_body = inbound_report[1:]
+                # NOTE: untested since i didn't have the time to setup a local irc server (rip scratchware...)
+                ct = datetime.datetime.now()
+                await self.send(f"PRIVMSG #reports :{nick}: User \"{report_msg_user}\" has been reported. Reason:  \"{report_msg_body}\" ({ct})")
+                await self.send(f"PRIVMSG {nick} Report sent :3")
+                # proposing for more information on the user report reply to be added
+                # example below
+                ## await self.send(f"PRIVMSG {nick} If you would like a follow up, join the Pesterchum Support discord server")
+                ## await self.send(f"PRIVMSG {nick} and ping an oper! Discord: https://discord.gg/eKbP6pvUmZ")
+            except ValueError:
+                await self.send(f"PRIVMSG {nick} Please provide a username and a reason.")
     async def ping(self, text):
         """Handle incoming pings"""
         await self.send("PONG" + text[4:])
